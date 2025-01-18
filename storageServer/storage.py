@@ -15,7 +15,7 @@ class CommandSkeleton(Resource):
     def get(self, method_id):
         return {"data": f"hello from command skeleton method {method_id}"}
 
-naming_server_register_stub = "http://127.0.0.1:5000/registration/"
+naming_server_register_stub = "http://172.17.0.2:5000/registration/"
 
 def register():
     response = requests.get(naming_server_register_stub+str(port))

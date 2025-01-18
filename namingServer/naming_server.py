@@ -47,3 +47,6 @@ class RegistrationSkeleton(Resource):
 
 api.add_resource(ServiceSkeleton, "/service/<int:service_id>")
 api.add_resource(RegistrationSkeleton, "/registration/<int:port>")
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)

@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-service_stub = "http://127.0.0.1:5000/service/"
+service_stub = "http://172.17.0.2:5000/service/"
 
 @app.route("/")
 def home():
