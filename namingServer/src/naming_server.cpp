@@ -8,7 +8,8 @@ int NamingServer::start(){
 	TreeNode n1;
 	n1.name = "n1";
 	n1.storage_server_id = 0;
-	m_tree_root.children.push_back(n1);
+	m_tree_root.name = "/";
+	m_tree_root.children.push_back(&n1);
 	service_skeleton.set_root(&m_tree_root);
 	service_skeleton.start(5000);
 	return 0;

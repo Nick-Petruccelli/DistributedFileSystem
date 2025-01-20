@@ -19,9 +19,9 @@ class ServiceSkeleton{
 		int get_storage(std::string path);
 		bool is_directory(std::string path);
 		std::list<std::string> list_dir(std::string path);
-		bool create_file(std::string path);
-		bool create_dir(std::string path);
-		bool del(std::string path);
+		int create_file(std::string path);
+		int create_dir(std::string path);
+		int del(std::string path);
 
 	private:
 		TreeNode* m_tree_root;

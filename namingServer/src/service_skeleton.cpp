@@ -95,12 +95,21 @@ int ServiceSkeleton::handle_call(std::vector<std::string> *method_call, char* da
 		return -1;
 	}
 	std::string method = method_call->at(0);
-	std::cout << method << std::endl;
 	if(method == "get_storage" && method_call->size() == 2){
-		std::cout << "hit call get_storage" << std::endl;
 		int storage_id = get_storage(method_call->at(1));
 		memset(data_buff, 0, 4096);
-		std::sprintf(data_buff, "%d\n", storage_id);
+		std::sprintf(data_buff, "%d", storage_id);
+	}else if(method == "create_file" && method_call->size() == 2){
+		int storage_id = create_file(method_call->at(1));
+		for(TreeNode* child : m_tree_root->children){
+			std::cout << child->name << std::endl;
+		}
+		memset(data_buff, 0, 4096);
+		if(storage_id >= 0){
+			std::sprintf(data_buff, "Created file at %s", method_call->at(1).c_str());
+		}else{
+			std::sprintf(data_buff, "Failed to create file at %s", method_call->at(1).c_str());
+		}
 	}
 	return 0;
 }
@@ -108,4 +117,9 @@ int ServiceSkeleton::handle_call(std::vector<std::string> *method_call, char* da
 int ServiceSkeleton::get_storage(std::string path){
 	int storage_server_id = m_tree_root->get_storage(path);	
 	return storage_server_id;
+}
+
+int ServiceSkeleton::create_file(std::string path){
+	std::cout << "hit create file serskel" << std::endl;
+	return m_tree_root->create_file(path);
 }
