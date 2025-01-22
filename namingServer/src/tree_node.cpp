@@ -1,5 +1,6 @@
 #include "../inc/tree_node.hpp"
 #include <iostream>
+#include <list>
 
 int TreeNode::get_storage(std::string path){
 	if(path == name){
@@ -83,12 +84,6 @@ int TreeNode::create_dir(std::string path){
 }
 
 int TreeNode::del(std::string path){
-	if(path == name){
-		if(children.size() != 0){
-			return -2;
-		}
-		return storage_server_id;
-	}
 	size_t next_slash_idx = path.find("/");
 	if(next_slash_idx == std::string::npos){
 		for(TreeNode *child : children){
@@ -115,4 +110,35 @@ void TreeNode::delete_branch(){
 		child->delete_branch();
 	}
 	delete this;
+}
+
+std::list<std::string> *TreeNode::list(std::string path){
+	std::list<std::string> *out = new std::list<std::string>;
+	if(path == name){
+		if(children.size() == 0){
+			out->push_back(path);
+			return out;
+		}
+		for(TreeNode *child : children){
+			out->push_back(child->name);
+		}
+		return out;
+	}
+	size_t next_slash_idx = path.find("/");
+	if(next_slash_idx == std::string::npos){
+		for(TreeNode *child : children){
+			if(child->name != path)
+				continue;
+			return child->list(path);
+		}
+		return out;
+	}
+	std::string next_node_name = path.substr(0, next_slash_idx);
+	path = path.substr(next_slash_idx+1);
+	for(TreeNode *child : children){
+		if(child->name != next_node_name)
+			continue;
+		return child->list(path);
+	}
+	return out;
 }

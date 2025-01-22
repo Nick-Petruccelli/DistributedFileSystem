@@ -19,7 +19,7 @@ class ServiceSkeleton{
 		int handle_call(std::vector<std::string> *call_recived, char* data_buff);
 		int get_storage(std::string path);
 		bool is_directory(std::string path);
-		std::list<std::string> list_dir(std::string path);
+		std::list<std::string> *list(std::string path);
 		int create_file(std::string path);
 		int create_dir(std::string path);
 		int del(std::string path);
