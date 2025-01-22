@@ -1,10 +1,17 @@
 #include "../inc/service_skeleton.hpp"
 #include <iostream>
 #include <string>
+#include <signal.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
+
+void ServiceSkeleton::exit_sig_handel(int sig){
+	shutdown(m_sock, SHUT_RDWR);
+	close(m_sock);
+	exit(0);
+}
 
 int ServiceSkeleton::start(int port){
 	m_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -26,11 +33,12 @@ int ServiceSkeleton::start(int port){
 		std::cerr << "Failed to listen on socket." << std::endl;
 		return -3;
 	}
-	
+
 	run();
 
 	return 0;
 }
+
 
 void ServiceSkeleton::set_root(TreeNode* tree_root){
 	m_tree_root = tree_root;
@@ -101,14 +109,20 @@ int ServiceSkeleton::handle_call(std::vector<std::string> *method_call, char* da
 		std::sprintf(data_buff, "%d", storage_id);
 	}else if(method == "create_file" && method_call->size() == 2){
 		int storage_id = create_file(method_call->at(1));
-		for(TreeNode* child : m_tree_root->children){
-			std::cout << child->name << std::endl;
-		}
 		memset(data_buff, 0, 4096);
 		if(storage_id >= 0){
 			std::sprintf(data_buff, "Created file at %s", method_call->at(1).c_str());
 		}else{
 			std::sprintf(data_buff, "Failed to create file at %s", method_call->at(1).c_str());
+		}
+	}else if(method == "create_dir" && method_call->size() == 2){
+		std::cout << "hit handel create dir" << std::endl;
+		int err = create_dir(method_call->at(1));
+		memset(data_buff, 0, 4096);
+		if(err >= 0){
+			std::sprintf(data_buff, "Created dir at %s", method_call->at(1).c_str());
+		}else{
+			std::sprintf(data_buff, "Failed to create dir at %s", method_call->at(1).c_str());
 		}
 	}
 	return 0;
@@ -120,6 +134,9 @@ int ServiceSkeleton::get_storage(std::string path){
 }
 
 int ServiceSkeleton::create_file(std::string path){
-	std::cout << "hit create file serskel" << std::endl;
 	return m_tree_root->create_file(path);
+}
+
+int ServiceSkeleton::create_dir(std::string path){
+	return m_tree_root->create_dir(path);
 }

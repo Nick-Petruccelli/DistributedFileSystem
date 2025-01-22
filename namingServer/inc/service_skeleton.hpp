@@ -9,11 +9,12 @@
 class ServiceSkeleton{
 	public:
 		int start(int port);
-		int stop();
+		void stop();
 		void set_root(TreeNode* tree_root);
 
 	private:
 		int run();
+		void exit_sig_handel(int sig);
 		int parse_call(std::string recv_str, std::vector<std::string> *method_call);
 		int handle_call(std::vector<std::string> *call_recived, char* data_buff);
 		int get_storage(std::string path);
