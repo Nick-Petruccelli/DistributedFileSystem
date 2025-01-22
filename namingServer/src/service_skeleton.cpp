@@ -116,13 +116,20 @@ int ServiceSkeleton::handle_call(std::vector<std::string> *method_call, char* da
 			std::sprintf(data_buff, "Failed to create file at %s", method_call->at(1).c_str());
 		}
 	}else if(method == "create_dir" && method_call->size() == 2){
-		std::cout << "hit handel create dir" << std::endl;
 		int err = create_dir(method_call->at(1));
 		memset(data_buff, 0, 4096);
 		if(err >= 0){
 			std::sprintf(data_buff, "Created dir at %s", method_call->at(1).c_str());
 		}else{
 			std::sprintf(data_buff, "Failed to create dir at %s", method_call->at(1).c_str());
+		}
+	}else if(method == "del" && method_call->size() == 2){
+		int err = del(method_call->at(1));
+		memset(data_buff, 0, 4096);
+		if(err >= 0){
+			std::sprintf(data_buff, "Deleted %s", method_call->at(1).c_str());
+		}else{
+			std::sprintf(data_buff, "Failed to delete %s", method_call->at(1).c_str());
 		}
 	}
 	return 0;
@@ -139,4 +146,7 @@ int ServiceSkeleton::create_file(std::string path){
 
 int ServiceSkeleton::create_dir(std::string path){
 	return m_tree_root->create_dir(path);
+}
+ int ServiceSkeleton::del(std::string path){
+	return m_tree_root->del(path);
 }

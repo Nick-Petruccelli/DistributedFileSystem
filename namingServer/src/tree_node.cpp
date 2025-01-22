@@ -82,3 +82,37 @@ int TreeNode::create_dir(std::string path){
 	return path_valid;
 }
 
+int TreeNode::del(std::string path){
+	if(path == name){
+		if(children.size() != 0){
+			return -2;
+		}
+		return storage_server_id;
+	}
+	size_t next_slash_idx = path.find("/");
+	if(next_slash_idx == std::string::npos){
+		for(TreeNode *child : children){
+			if(child->name != path)
+				continue;
+			children.remove(child);
+			child->delete_branch();
+			return 0;
+		}
+		return -1;
+	}
+	std::string next_node_name = path.substr(0, next_slash_idx);
+	path = path.substr(next_slash_idx+1);
+	for(TreeNode *child : children){
+		if(child->name != next_node_name)
+			continue;
+		return child->del(path);
+	}
+	return -1;
+}
+
+void TreeNode::delete_branch(){
+	for(TreeNode *child : children){
+		child->delete_branch();
+	}
+	delete this;
+}
