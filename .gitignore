@@ -1,4 +1,4 @@
 */pipenv
 *__pycache__*
 */bin/*
-*/bin/*
+*/obj/*

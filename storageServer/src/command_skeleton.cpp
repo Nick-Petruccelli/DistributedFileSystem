@@ -1,18 +1,14 @@
-#include "../inc/service_skeleton.hpp"
-#include <iostream>
-#include <string>
+#include "../inc/command_skeleton.hpp"
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
+#include <iostream>
 #include <cstring>
+#include <vector>
+#include <string>
+#include <unistd.h>
 
-void ServiceSkeleton::exit_sig_handel(int sig){
-	shutdown(m_sock, SHUT_RDWR);
-	close(m_sock);
-	exit(0);
-}
+int CommandSkeleton::start(int port, std::filesystem::path root){
+	m_root = root;
 
-int ServiceSkeleton::start(int port){
 	m_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if(m_sock < 0){
 		std::cerr << "Failed to create socket" << std::endl;
@@ -20,7 +16,7 @@ int ServiceSkeleton::start(int port){
 	}
 
 	m_hint.sin_family = AF_INET;
-	m_hint.sin_port = htons(5000);
+	m_hint.sin_port = htons(port);
 	m_hint.sin_addr.s_addr = INADDR_ANY;
 
 	if(bind(m_sock, (struct sockaddr*)&m_hint, sizeof(m_hint)) < 0){
@@ -33,17 +29,15 @@ int ServiceSkeleton::start(int port){
 		return -3;
 	}
 
-	run();
-
-	return 0;
+	int run_err = run();
+	return run_err;
 }
 
+void CommandSkeleton::stop(){
 
-void ServiceSkeleton::set_root(TreeNode* tree_root){
-	m_tree_root = tree_root;
 }
 
-int ServiceSkeleton::run(){
+int CommandSkeleton::run(){
 	while(true){
 		int client_sock = accept(m_sock, (struct sockaddr*)&m_client, &m_client_len);
 		if(client_sock < 0){
@@ -72,7 +66,7 @@ int ServiceSkeleton::run(){
 	return 0;
 }
 
-int ServiceSkeleton::parse_call(std::string recv_str, std::vector<std::string> *method_call){
+int CommandSkeleton::parse_call(std::string recv_str, std::vector<std::string> *method_call){
 	int args_start_idx = recv_str.find("(");
 	if(args_start_idx == std::string::npos){
 		return -1;
@@ -97,70 +91,47 @@ int ServiceSkeleton::parse_call(std::string recv_str, std::vector<std::string> *
 	return 0;
 }
 
-int ServiceSkeleton::handle_call(std::vector<std::string> *method_call, char* data_buff){
+int CommandSkeleton::handle_call(std::vector<std::string> *method_call, char* data_buff){
 	if(method_call->size() == 0){
 		return -1;
 	}
 	std::string method = method_call->at(0);
-	if(method == "get_storage" && method_call->size() == 2){
-		int storage_id = get_storage(method_call->at(1));
+	if(method == "create_file" && method_call->size() == 2){
+		int storage_id = create_file(method_call->at(1));
 		memset(data_buff, 0, 4096);
 		std::sprintf(data_buff, "%d", storage_id);
-	}else if(method == "create_file" && method_call->size() == 2){
-		int storage_id = create_file(method_call->at(1));
+	}else if(method == "create_dir" && method_call->size() == 2){
+		int storage_id = create_dir(method_call->at(1));
 		memset(data_buff, 0, 4096);
 		if(storage_id >= 0){
 			std::sprintf(data_buff, "Created file at %s", method_call->at(1).c_str());
 		}else{
 			std::sprintf(data_buff, "Failed to create file at %s", method_call->at(1).c_str());
 		}
-	}else if(method == "create_dir" && method_call->size() == 2){
-		int err = create_dir(method_call->at(1));
+	}else if(method == "del" && method_call->size() == 2){
+		int err = del(method_call->at(1));
 		memset(data_buff, 0, 4096);
 		if(err >= 0){
 			std::sprintf(data_buff, "Created dir at %s", method_call->at(1).c_str());
 		}else{
 			std::sprintf(data_buff, "Failed to create dir at %s", method_call->at(1).c_str());
 		}
-	}else if(method == "del" && method_call->size() == 2){
-		int err = del(method_call->at(1));
-		memset(data_buff, 0, 4096);
-		if(err >= 0){
-			std::sprintf(data_buff, "Deleted %s", method_call->at(1).c_str());
-		}else{
-			std::sprintf(data_buff, "Failed to delete %s", method_call->at(1).c_str());
-		}
-	}else if(method == "list" && method_call->size() == 2){
-		std::list<std::string> *ls = list(method_call->at(1));
-		memset(data_buff, 0, 4096);
-		std::string out;
-		for(std::string s : *ls){
-			out.append(s);
-			out.append(",");
-		}
-		out.pop_back();
-		sprintf(data_buff, "%s", out.c_str());
 	}
 	return 0;
 }
 
-int ServiceSkeleton::get_storage(std::string path){
-	int storage_server_id = m_tree_root->get_storage(path);	
-	return storage_server_id;
+
+int CommandSkeleton::create_dir(std::filesystem::path path){
+
+	return 0;
 }
 
-int ServiceSkeleton::create_file(std::string path){
-	return m_tree_root->create_file(path);
+int CommandSkeleton::create_file(std::filesystem::path path){
+
+	return 0;
 }
 
-int ServiceSkeleton::create_dir(std::string path){
-	return m_tree_root->create_dir(path);
-}
+int CommandSkeleton::del(std::filesystem::path path){
 
-int ServiceSkeleton::del(std::string path){
-	return m_tree_root->del(path);
-}
-
-std::list<std::string> *ServiceSkeleton::list(std::string path){
-	return m_tree_root->list(path);
+	return 0;
 }
