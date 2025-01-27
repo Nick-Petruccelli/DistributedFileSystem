@@ -1,6 +1,7 @@
-#include "../inc/naming_server.hpp"
+#include "../inc/storage_server.hpp"
 
 int main(){
-	NamingServer naming_server;
-	naming_server.start();
+	StorageServer storage_server;
+	std::filesystem::path root = "/home/nickp/test_storage/";
+	storage_server.start(root);
 }

@@ -5,7 +5,7 @@
 #include "registration_stub.hpp"
 #include <filesystem>
 
-class NamingServer{
+class StorageServer{
 public:
 	int start(std::filesystem::path root);
 

@@ -1,6 +1,8 @@
 #include "../inc/command_skeleton.hpp"
+#include <filesystem>
 #include <sys/socket.h>
 #include <iostream>
+#include <fstream>
 #include <cstring>
 #include <vector>
 #include <string>
@@ -122,16 +124,22 @@ int CommandSkeleton::handle_call(std::vector<std::string> *method_call, char* da
 
 
 int CommandSkeleton::create_dir(std::filesystem::path path){
-
+	std::filesystem::path full_path = m_root / path;
+	if(!std::filesystem::create_directory(full_path))
+		return -1;
 	return 0;
 }
 
 int CommandSkeleton::create_file(std::filesystem::path path){
-
+	std::filesystem::path full_path = m_root / path;
+	std::ofstream Myfile(full_path);
+	Myfile.close();
 	return 0;
 }
 
 int CommandSkeleton::del(std::filesystem::path path){
-
+	std::filesystem::path full_path = m_root / path;
+	if(std::remove(full_path.c_str()) != 0)
+		return 1;
 	return 0;
 }
