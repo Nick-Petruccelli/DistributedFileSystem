@@ -108,15 +108,15 @@ int CommandSkeleton::handle_call(std::vector<std::string> *method_call, char* da
 		if(storage_id >= 0){
 			std::sprintf(data_buff, "Created file at %s", method_call->at(1).c_str());
 		}else{
-			std::sprintf(data_buff, "Failed to create file at %s", method_call->at(1).c_str());
+			std::sprintf(data_buff, "Failed to create dir at %s", method_call->at(1).c_str());
 		}
 	}else if(method == "del" && method_call->size() == 2){
 		int err = del(method_call->at(1));
 		memset(data_buff, 0, 4096);
 		if(err >= 0){
-			std::sprintf(data_buff, "Created dir at %s", method_call->at(1).c_str());
+			std::sprintf(data_buff, "Deleted %s", method_call->at(1).c_str());
 		}else{
-			std::sprintf(data_buff, "Failed to create dir at %s", method_call->at(1).c_str());
+			std::sprintf(data_buff, "Failed to delete %s", method_call->at(1).c_str());
 		}
 	}
 	return 0;
@@ -132,8 +132,8 @@ int CommandSkeleton::create_dir(std::filesystem::path path){
 
 int CommandSkeleton::create_file(std::filesystem::path path){
 	std::filesystem::path full_path = m_root / path;
-	std::ofstream Myfile(full_path);
-	Myfile.close();
+	std::ofstream file(full_path, std::ios::binary);
+	file.close();
 	return 0;
 }
 
